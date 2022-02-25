@@ -5,7 +5,7 @@ interface ColumnProps {
   key: string;
   column: { title: string; id: string; taskIds: string[] };
   task: { id: string; content: string }[];
-  isDropDisabled:boolean
+  isDropDisabled: boolean;
 }
 const Index: React.FC<ColumnProps> = (props) => {
   return (
@@ -40,15 +40,17 @@ export default Index;
 // snapshot = {isDraggingOver:blooean,draggingOverWith:taskid}
 // isDraggingOver set to true when draggable is dropping over droppable
 
-
-// type is optional property 
+// type is optional property
 // if we have assigned a type to columns then it allows to drop item only if
 // source and destination has same type
 // 1st and 2nd hase same type and third has diffrent
-
 
 // isDropDisabled = true means it will not allows to drop
 // here we created logic like if source column order is less than destination columns order then \
 // we have set this true so we cant drop task of high order task on low order task like
 // not possible 2 -> 1 but 1->2 possible
 // also refer above point so 3rd columns is disabled because of type mismatch
+
+//<Droppable direction/> property
+// by default verticl so if we make it as horizontal it allows us to drag drop hotizontaly
+// check video number 11
