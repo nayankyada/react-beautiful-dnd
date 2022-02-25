@@ -1,38 +1,46 @@
 import React from "react";
 import Task from "Task";
-import { Droppable } from "react-beautiful-dnd";
+import { Droppable, Draggable } from "react-beautiful-dnd";
 interface ColumnProps {
   key: string;
   column: { title: string; id: string; taskIds: string[] };
   task: { id: string; content: string }[];
-  isDropDisabled: boolean;
+  index: number;
 }
 const Index: React.FC<ColumnProps> = (props) => {
   return (
-    <div className="m-2 border-2 rounded-md w-1/3 flex flex-col">
-      <h3 className="text-xl font-bold p-4">{props.column.title}</h3>
+    <Draggable draggableId={props.column.id} index={props.index}>
+      {(provided) => (
+        <div
+          {...provided.draggableProps}
+          
+          ref={provided.innerRef}
+          className="m-2 border-2 rounded-md w-1/3 flex flex-col"
+        >
+          <h3 {...provided.dragHandleProps} className="text-xl font-bold p-4">{props.column.title}</h3>
 
-      <Droppable
-        droppableId={props.column.id}
-        isDropDisabled={props.isDropDisabled}
-        type={props.column.id === "column-3" ? "done" : "active"}
-      >
-        {(provided, snapshot) => (
-          <div
-            className={`p-4 flex-grow ${
-              snapshot.isDraggingOver && "bg-green-200"
-            }`}
-            ref={provided.innerRef}
-            {...provided.droppableProps}
+          <Droppable
+            droppableId={props.column.id}
+            type="task"
           >
-            {props.task.map((task, index) => (
-              <Task index={index} task={task} key={task.id}></Task>
-            ))}
-            {provided.placeholder}
-          </div>
-        )}
-      </Droppable>
-    </div>
+            {(provided, snapshot) => (
+              <div
+                className={`p-4 flex-grow ${
+                  snapshot.isDraggingOver && "bg-green-200"
+                }`}
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+              >
+                {props.task.map((task, index) => (
+                  <Task index={index} task={task} key={task.id}></Task>
+                ))}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </div>
+      )}
+    </Draggable>
   );
 };
 export default Index;

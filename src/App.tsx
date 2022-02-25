@@ -2,17 +2,12 @@ import "styles/global.css";
 import initialData from "initialdata";
 import { useState } from "react";
 import Column from "Column";
-import { DragDropContext } from "react-beautiful-dnd";
+import { DragDropContext, Droppable } from "react-beautiful-dnd";
 function App(): JSX.Element {
   const [state, setState] = useState(initialData);
-  const [homeIndex, setHomeIndex] = useState<number>();
-  const onDragStart = (start) => {
-    const index = state.columnOrder.indexOf(start.source.droppableId);
-    setHomeIndex(index);
-  };
+  
   const onDragEnd = (result) => {
-    setHomeIndex(null)
-    const { destination, draggableId, source } = result;
+    const { destination, draggableId, source,type } = result;
     console.log(result);
 
     // if destination null means drop outside DragDropContext
@@ -25,14 +20,19 @@ function App(): JSX.Element {
       destination.droppableId === source.droppableId &&
       destination.index === source.index
     ) {
-      console.log("hihihi");
       return;
     }
 
     // need to remove taskid of source from that column
     const start = state.column[source.droppableId];
     const finish = state.column[destination.droppableId];
-    console.log(start, finish);
+    if(type === "column"){
+      const newColumnOrder = Array.from(state.columnOrder)
+      newColumnOrder.splice(source.index,1)
+      newColumnOrder.splice(destination.index,0,draggableId)
+      setState(prev => ({...prev,columnOrder:newColumnOrder}))
+      return
+    }
     if (start === finish) {
       const newTaskIds = Array.from(start.taskIds);
       newTaskIds.splice(source.index, 1);
@@ -46,7 +46,6 @@ function App(): JSX.Element {
         column: { ...state.column, [newColumn.id]: newColumn },
       });
     } else {
-      console.log("hihihih");
       const startTaskIds = Array.from(start.taskIds);
       startTaskIds.splice(source.index, 1);
       const newStart = {
@@ -60,7 +59,6 @@ function App(): JSX.Element {
         ...finish,
         taskIds: finishTaskIds,
       };
-      console.log(startTaskIds, finishTaskIds);
       setState({
         ...state,
         column: {
@@ -73,26 +71,52 @@ function App(): JSX.Element {
   };
   return (
     <div className="App">
-      <ul >
+      <ul>
         <li>main-branch : drag and drop between 3 col</li>
-        <li>advance-branch : drag and drop between 2 col and also col dragable</li>
+        <li>
+          advance-branch : drag and drop between 2 col and also col dragable
+        </li>
       </ul>
-      <DragDropContext onDragEnd={onDragEnd} onDragStart={onDragStart}>
-        <div className="flex">
-          {state.columnOrder.map((columnId,index) => {
-            const column = state.column[columnId];
-            const tasks = column.taskIds.map((taskId) => state.task[taskId]);
-            const isDropDisabled = index < homeIndex;
+      <DragDropContext onDragEnd={onDragEnd} >
+        <Droppable
+          droppableId="all-columns"
+          direction="horizontal"
+          type="column"
+        >
+          {(provided) => (
+            <div
+              className="flex"
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+            >
+              {state.columnOrder.map((columnId, index) => {
+                const column = state.column[columnId];
+                const tasks = column.taskIds.map(
+                  (taskId) => state.task[taskId]
+                );
+                
 
-            return <Column key={column.id} column={column} task={tasks} isDropDisabled={isDropDisabled}/>;
-          })}
-        </div>
+                return (
+                  <Column
+                    key={column.id}
+                    column={column}
+                    task={tasks}
+                    index={index}
+                  />
+                );
+              })}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
       </DragDropContext>
     </div>
   );
 }
 
 export default App;
+
+// for advance branch check layout image in video 12
 
 // three callback in DragDropContext
 // we can log of each call back by passing functiom
