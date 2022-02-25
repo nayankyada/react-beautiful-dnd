@@ -73,6 +73,10 @@ function App(): JSX.Element {
   };
   return (
     <div className="App">
+      <ul >
+        <li>main-branch : drag and drop between 3 col</li>
+        <li>advance-branch : drag and drop between 2 col and also col dragable</li>
+      </ul>
       <DragDropContext onDragEnd={onDragEnd} onDragStart={onDragStart}>
         <div className="flex">
           {state.columnOrder.map((columnId,index) => {
