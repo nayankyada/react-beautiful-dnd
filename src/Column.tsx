@@ -9,7 +9,7 @@ interface ColumnProps {
 }
 const Index: React.FC<ColumnProps> = (props) => {
   return (
-    <div className="m-2 border-2 rounded-md w-1/3 flex flex-col">
+    <div className="m-2 border-2 rounded-md w-1/3 flex flex-col h-64 overflow-scroll">
       <h3 className="text-xl font-bold p-4">{props.column.title}</h3>
 
       <Droppable

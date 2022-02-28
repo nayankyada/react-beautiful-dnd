@@ -25,7 +25,6 @@ function App(): JSX.Element {
       destination.droppableId === source.droppableId &&
       destination.index === source.index
     ) {
-      console.log("hihihi");
       return;
     }
 
