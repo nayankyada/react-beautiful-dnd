@@ -5,13 +5,14 @@ import Column from "Column";
 import { DragDropContext } from "react-beautiful-dnd";
 function App(): JSX.Element {
   const [state, setState] = useState(initialData);
+  const [role, setRole] = useState("editor");
   const [homeIndex, setHomeIndex] = useState<number>();
   const onDragStart = (start) => {
     const index = state.columnOrder.indexOf(start.source.droppableId);
     setHomeIndex(index);
   };
   const onDragEnd = (result) => {
-    setHomeIndex(null)
+    setHomeIndex(null);
     const { destination, draggableId, source } = result;
     console.log(result);
 
@@ -32,20 +33,7 @@ function App(): JSX.Element {
     const start = state.column[source.droppableId];
     const finish = state.column[destination.droppableId];
     console.log(start, finish);
-    if (start === finish) {
-      const newTaskIds = Array.from(start.taskIds);
-      newTaskIds.splice(source.index, 1);
-      newTaskIds.splice(destination.index, 0, draggableId);
-      const newColumn = {
-        ...start,
-        taskIds: newTaskIds,
-      };
-      setState({
-        ...state,
-        column: { ...state.column, [newColumn.id]: newColumn },
-      });
-    } else {
-      console.log("hihihih");
+    if (start !== finish) {
       const startTaskIds = Array.from(start.taskIds);
       startTaskIds.splice(source.index, 1);
       const newStart = {
@@ -54,12 +42,11 @@ function App(): JSX.Element {
       };
 
       const finishTaskIds = Array.from(finish.taskIds);
-      finishTaskIds.splice(destination.index, 0, draggableId);
+      finishTaskIds.splice(0, 0, draggableId);
       const newFinish = {
         ...finish,
         taskIds: finishTaskIds,
       };
-      console.log(startTaskIds, finishTaskIds);
       setState({
         ...state,
         column: {
@@ -70,20 +57,43 @@ function App(): JSX.Element {
       });
     }
   };
+
   return (
     <div className="App">
-      <ul >
-        <li>main-branch : drag and drop between 3 col</li>
-        <li>advance-branch : drag and drop between 2 col and also col dragable</li>
-      </ul>
+      <div className="flex gap-4 my-4 center items-center">
+        <button
+          className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          onClick={() => {
+            setRole("developer");
+          }}
+        >
+          Spotter / Writer
+        </button>
+        <button
+          className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+          onClick={() => {
+            setRole("editor");
+          }}
+        >
+          Editor
+        </button>
+        <p className="text-md">
+          Current Role : <span className="font-bold">{role}</span>
+        </p>
+      </div>
       <DragDropContext onDragEnd={onDragEnd} onDragStart={onDragStart}>
-        <div className="flex">
-          {state.columnOrder.map((columnId,index) => {
+        <div className="flex gap-3">
+          {state.columnOrder.map((columnId, index) => {
             const column = state.column[columnId];
             const tasks = column.taskIds.map((taskId) => state.task[taskId]);
-            const isDropDisabled = index < homeIndex;
-
-            return <Column key={column.id} column={column} task={tasks} isDropDisabled={isDropDisabled}/>;
+            return (
+              <Column
+                key={column.id}
+                column={column}
+                task={tasks}
+                role={role}
+              />
+            );
           })}
         </div>
       </DragDropContext>

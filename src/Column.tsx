@@ -1,32 +1,71 @@
 import React from "react";
 import Task from "Task";
 import { Droppable } from "react-beautiful-dnd";
+import {
+  disabledStageForEditor,
+  disabledStageForWriterAndSpotter,
+  stageColor,
+} from "constant";
 interface ColumnProps {
   key: string;
   column: { title: string; id: string; taskIds: string[] };
   task: { id: string; content: string }[];
-  isDropDisabled: boolean;
+  role: string;
 }
+
 const Index: React.FC<ColumnProps> = (props) => {
+  const isColumnDroppable = () => {
+    if (props.role === "developer") {
+      return disabledStageForWriterAndSpotter.includes(props.column.id);
+    }
+    if (props.role === "editor") {
+      return disabledStageForEditor.includes(props.column.id);
+    }
+    return false;
+  };
+
+  const calculateBackgroundColor = (columnId, isDraggingOver) => {
+    let color = stageColor[columnId][isDraggingOver ? "dropOver" : "default"];
+    if (
+      (disabledStageForWriterAndSpotter.includes(columnId) &&
+        props.role === "developer") ||
+      (disabledStageForEditor.includes(columnId) && props.role === "editor")
+    ) {
+      color = "#e7e5e4";
+    }
+    console.log(color);
+    return color;
+  };
   return (
-    <div className="m-2 border-2 rounded-md w-1/3 flex flex-col h-64 overflow-scroll">
-      <h3 className="text-xl font-bold p-4">{props.column.title}</h3>
+    <div
+      className={`border-2 rounded-md w-1/3 flex flex-col h-full overflow-auto`}
+    >
+      <h3 className="text-md font-bold p-4">{props.column.title}</h3>
 
       <Droppable
         droppableId={props.column.id}
-        isDropDisabled={props.isDropDisabled}
-        type={props.column.id === "column-3" ? "done" : "active"}
+        isDropDisabled={isColumnDroppable()}
       >
         {(provided, snapshot) => (
           <div
-            className={`p-4 flex-grow ${
-              snapshot.isDraggingOver && "bg-green-200"
-            }`}
+            style={{
+              backgroundColor: calculateBackgroundColor(
+                props.column.id,
+                snapshot.isDraggingOver
+              ),
+            }}
+            className={`p-4 flex-grow`}
             ref={provided.innerRef}
             {...provided.droppableProps}
           >
             {props.task.map((task, index) => (
-              <Task index={index} task={task} key={task.id}></Task>
+              <Task
+                index={index}
+                task={task}
+                key={task.id}
+                column={props.column}
+                role={props.role}
+              ></Task>
             ))}
             {provided.placeholder}
           </div>
