@@ -1,19 +1,14 @@
 import React from "react";
-import Task from "Task";
+import Task from "./Task";
 import { Droppable } from "react-beautiful-dnd";
 import {
   disabledStageForEditor,
   disabledStageForWriterAndSpotter,
   stageColor,
-} from "constant";
-interface ColumnProps {
-  key: string;
-  column: { title: string; id: string; taskIds: string[] };
-  task: { id: string; content: string }[];
-  role: string;
-}
+} from "./constant";
 
-const Index: React.FC<ColumnProps> = (props) => {
+
+const Index = (props) => {
   const isColumnDroppable = () => {
     if (props.role === "developer") {
       return disabledStageForWriterAndSpotter.includes(props.column.id);
@@ -33,7 +28,6 @@ const Index: React.FC<ColumnProps> = (props) => {
     ) {
       color = "#e7e5e4";
     }
-    console.log(color);
     return color;
   };
   return (
@@ -65,6 +59,7 @@ const Index: React.FC<ColumnProps> = (props) => {
                 key={task.id}
                 column={props.column}
                 role={props.role}
+                isDragDisabled={props.isDragDisabled}
               ></Task>
             ))}
             {provided.placeholder}

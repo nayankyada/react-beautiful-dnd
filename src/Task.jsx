@@ -1,17 +1,13 @@
 import React from "react";
 import { Draggable } from "react-beautiful-dnd";
-interface TaskProps {
-  task: { id: string; content: string };
-  index: number;
-  column: { title: string; id: string; taskIds: string[] };
-  role: string;
-}
-const Index: React.FC<TaskProps> = (props) => {
+import { STATUS } from "./constant";
+
+const Index = (props) => {
   return (
     <Draggable
       draggableId={props.task.id}
       index={props.index}
-      isDragDisabled={["scheduled"].includes(props.column.id)}
+      isDragDisabled={[STATUS.SCHEDULED].includes(props.column.id) || props.isDragDisabled}
     >
       {(provided, snapshot) => (
         <div
@@ -22,8 +18,8 @@ const Index: React.FC<TaskProps> = (props) => {
           }`}
         >
           <div className="flex space-x-2" {...provided.dragHandleProps}>
-            <div className="bg-orange-500 w-6 h-6 rounded-md"></div>
-            <div>{props.task.content}</div>
+            <img src={props.task.cover_image.asset.url} className="bg-orange-500 w-6 h-6 rounded-md"></img>
+            <div>{props.task.id}</div>
           </div>
         </div>
       )}
