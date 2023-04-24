@@ -11,10 +11,12 @@ function App() {
 
   const onDragEnd = (result) => {
     setIsDragDisabled(true);
+
     const { destination, draggableId, source } = result;
 
     // if destination null means drop outside DragDropContext
     if (!destination) {
+      setIsDragDisabled(false);
       return;
     }
 
@@ -23,6 +25,7 @@ function App() {
       destination.droppableId === source.droppableId &&
       destination.index === source.index
     ) {
+      setIsDragDisabled(false);
       return;
     }
 
@@ -73,7 +76,6 @@ function App() {
   };
 
   const fetchData = () => {
-    setIsDragDisabled(true);
     let data = {
       task: {},
       column: {
@@ -122,6 +124,17 @@ function App() {
         `*[_type == "workflow_piece" && (_id in path('drafts.**'))]{
     "id":_id,
     headline,
+    topic -> {
+      _id,
+      name,
+      cover_image{
+        asset->{url}
+      }
+    },
+    category -> {
+      title
+    },
+    contextual_title,  
     status,
     cover_image{
       asset -> {url}
@@ -136,14 +149,16 @@ function App() {
             element.id,
           ];
         });
-      }).catch(() => {
-        toast.error("Something went wrong please try again...")
+      })
+      .catch(() => {
+        toast.error("Something went wrong please try again...");
       })
       .finally(() => {
         setIsDragDisabled(false);
-        setState(data)
+        setState(data);
       });
   };
+
   useEffect(() => {
     fetchData();
   }, []);
@@ -194,7 +209,3 @@ function App() {
 }
 
 export default App;
-
-// three callback in DragDropContext
-// we can log of each call back by passing functiom
-// onDragStart onDragUpdate onDragEnd

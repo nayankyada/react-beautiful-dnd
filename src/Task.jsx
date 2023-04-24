@@ -7,19 +7,41 @@ const Index = (props) => {
     <Draggable
       draggableId={props.task.id}
       index={props.index}
-      isDragDisabled={[STATUS.SCHEDULED].includes(props.column.id) || props.isDragDisabled}
+      isDragDisabled={
+        [STATUS.SCHEDULED].includes(props.column.id) || props.isDragDisabled
+      }
     >
       {(provided, snapshot) => (
         <div
           {...provided.draggableProps}
           ref={provided.innerRef}
-          className={`border-2 p-2 border-gray-500 mb-2 rounded-md1 ${
-            snapshot.isDragging && "bg-blue-200"
-          }`}
+          className={`border-[1px] p-2 border-gray-500 rounded-md bg-white`}
         >
-          <div className="flex space-x-2" {...provided.dragHandleProps}>
-            <img src={props.task.cover_image.asset.url} className="bg-orange-500 w-6 h-6 rounded-md"></img>
-            <div>{props.task.id}</div>
+          <div
+            className=" flex space-x-2 box-border	overflow-hidden"
+            {...provided.dragHandleProps}
+          >
+            <div className="flex">
+              <img
+                src={props.task.cover_image.asset.url}
+                style={{ maxWidth: "75px", maxHeight: "75px" }}
+                className="bg-orange-500  rounded-sm"
+              ></img>
+            </div>
+            <div className="flex flex-col max-w-[calc(100%_-_80px)]">
+              <div className="select-none font-bold text-lg text-blue-500 truncate ">
+                {props.task.topic.name}
+              </div>
+              <div className="select-none text-sm text-bold truncate">
+                {props.task.contextual_title}
+              </div>
+              <div className="select-none	text-sm text-gray-400 truncate">
+                {props.task.category.title}
+              </div>
+            </div>
+          </div>
+          <div className="select-none font-bold mt-1  ">
+            <p className="line-clamp-2">{props.task.headline}</p>
           </div>
         </div>
       )}
@@ -27,13 +49,3 @@ const Index = (props) => {
   );
 };
 export default Index;
-
-// provided provides required props to handle functionality
-// snapshot = {isDragging:blooean,draggingOver:columnid}
-
-// div with dragHandleProps allows to make a div dragable
-// 1. apply it to orange box
-// 2. apply to container
-// so here orange blocks allows to drag insted of whole taskbar
-
-// isDragDisabled ->  set to true if want to disable drag of specific task
